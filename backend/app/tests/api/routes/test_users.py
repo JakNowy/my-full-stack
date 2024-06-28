@@ -37,8 +37,8 @@ def test_create_user_new_email(
 ) -> None:
     with (
         patch("app.utils.send_email", return_value=None),
-        patch("app.core.config.settings.SMTP_HOST", "smtp.example.com"),
-        patch("app.core.config.settings.SMTP_USER", "admin@example.com"),
+        patch("app.common.config.settings.SMTP_HOST", "smtp.example.com"),
+        patch("app.common.config.settings.SMTP_USER", "admin@example.com"),
     ):
         username = random_email()
         password = random_lower_string()
@@ -282,7 +282,7 @@ def test_update_password_me_same_password_error(
 
 
 def test_register_user(client: TestClient, db: Session) -> None:
-    with patch("app.core.config.settings.USERS_OPEN_REGISTRATION", True):
+    with patch("app.common.config.settings.USERS_OPEN_REGISTRATION", True):
         username = random_email()
         password = random_lower_string()
         full_name = random_lower_string()
@@ -305,7 +305,7 @@ def test_register_user(client: TestClient, db: Session) -> None:
 
 
 def test_register_user_forbidden_error(client: TestClient) -> None:
-    with patch("app.core.config.settings.USERS_OPEN_REGISTRATION", False):
+    with patch("app.common.config.settings.USERS_OPEN_REGISTRATION", False):
         username = random_email()
         password = random_lower_string()
         full_name = random_lower_string()
@@ -321,7 +321,7 @@ def test_register_user_forbidden_error(client: TestClient) -> None:
 
 
 def test_register_user_already_exists_error(client: TestClient) -> None:
-    with patch("app.core.config.settings.USERS_OPEN_REGISTRATION", True):
+    with patch("app.common.config.settings.USERS_OPEN_REGISTRATION", True):
         password = random_lower_string()
         full_name = random_lower_string()
         data = {

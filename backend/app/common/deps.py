@@ -1,4 +1,3 @@
-from collections.abc import Generator
 from typing import Annotated
 
 import jwt
@@ -7,20 +6,21 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlmodel import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common import security
 from app.common.config import settings
-from app.common.db import engine
 from app.models import TokenPayload, User
+from app.db.session import session
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_PREFIX}/login/access-token"
 )
 
 
-def get_db() -> Generator[Session, None, None]:
-    with Session(engine) as session:
-        yield session
+async def get_db() -> AsyncSession:
+    async with session() as db:
+        yield db
 
 
 def get_current_user(session: "SessionDep", token: "TokenDep") -> User:
