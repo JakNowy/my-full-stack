@@ -10,7 +10,7 @@ def test_create_item(
 ) -> None:
     data = {"title": "Foo", "description": "Fighters"}
     response = client.post(
-        f"{settings.API_V1_STR}/items/",
+        f"{settings.API_PREFIX}/items/",
         headers=superuser_token_headers,
         json=data,
     )
@@ -27,7 +27,7 @@ def test_read_item(
 ) -> None:
     item = create_random_item(db)
     response = client.get(
-        f"{settings.API_V1_STR}/items/{item.id}",
+        f"{settings.API_PREFIX}/items/{item.id}",
         headers=superuser_token_headers,
     )
     assert response.status_code == 200
@@ -42,7 +42,7 @@ def test_read_item_not_found(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     response = client.get(
-        f"{settings.API_V1_STR}/items/999",
+        f"{settings.API_PREFIX}/items/999",
         headers=superuser_token_headers,
     )
     assert response.status_code == 404
@@ -55,7 +55,7 @@ def test_read_item_not_enough_permissions(
 ) -> None:
     item = create_random_item(db)
     response = client.get(
-        f"{settings.API_V1_STR}/items/{item.id}",
+        f"{settings.API_PREFIX}/items/{item.id}",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 400
@@ -69,7 +69,7 @@ def test_read_items(
     create_random_item(db)
     create_random_item(db)
     response = client.get(
-        f"{settings.API_V1_STR}/items/",
+        f"{settings.API_PREFIX}/items/",
         headers=superuser_token_headers,
     )
     assert response.status_code == 200
@@ -83,7 +83,7 @@ def test_update_item(
     item = create_random_item(db)
     data = {"title": "Updated title", "description": "Updated description"}
     response = client.put(
-        f"{settings.API_V1_STR}/items/{item.id}",
+        f"{settings.API_PREFIX}/items/{item.id}",
         headers=superuser_token_headers,
         json=data,
     )
@@ -100,7 +100,7 @@ def test_update_item_not_found(
 ) -> None:
     data = {"title": "Updated title", "description": "Updated description"}
     response = client.put(
-        f"{settings.API_V1_STR}/items/999",
+        f"{settings.API_PREFIX}/items/999",
         headers=superuser_token_headers,
         json=data,
     )
@@ -115,7 +115,7 @@ def test_update_item_not_enough_permissions(
     item = create_random_item(db)
     data = {"title": "Updated title", "description": "Updated description"}
     response = client.put(
-        f"{settings.API_V1_STR}/items/{item.id}",
+        f"{settings.API_PREFIX}/items/{item.id}",
         headers=normal_user_token_headers,
         json=data,
     )
@@ -129,7 +129,7 @@ def test_delete_item(
 ) -> None:
     item = create_random_item(db)
     response = client.delete(
-        f"{settings.API_V1_STR}/items/{item.id}",
+        f"{settings.API_PREFIX}/items/{item.id}",
         headers=superuser_token_headers,
     )
     assert response.status_code == 200
@@ -141,7 +141,7 @@ def test_delete_item_not_found(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     response = client.delete(
-        f"{settings.API_V1_STR}/items/999",
+        f"{settings.API_PREFIX}/items/999",
         headers=superuser_token_headers,
     )
     assert response.status_code == 404
@@ -154,7 +154,7 @@ def test_delete_item_not_enough_permissions(
 ) -> None:
     item = create_random_item(db)
     response = client.delete(
-        f"{settings.API_V1_STR}/items/{item.id}",
+        f"{settings.API_PREFIX}/items/{item.id}",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 400

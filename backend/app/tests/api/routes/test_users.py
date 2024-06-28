@@ -13,7 +13,7 @@ from app.tests.utils.utils import random_email, random_lower_string
 def test_get_users_superuser_me(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
-    r = client.get(f"{settings.API_V1_STR}/users/me", headers=superuser_token_headers)
+    r = client.get(f"{settings.API_PREFIX}/users/me", headers=superuser_token_headers)
     current_user = r.json()
     assert current_user
     assert current_user["is_active"] is True
@@ -24,7 +24,7 @@ def test_get_users_superuser_me(
 def test_get_users_normal_user_me(
     client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
-    r = client.get(f"{settings.API_V1_STR}/users/me", headers=normal_user_token_headers)
+    r = client.get(f"{settings.API_PREFIX}/users/me", headers=normal_user_token_headers)
     current_user = r.json()
     assert current_user
     assert current_user["is_active"] is True
@@ -44,7 +44,7 @@ def test_create_user_new_email(
         password = random_lower_string()
         data = {"email": username, "password": password}
         r = client.post(
-            f"{settings.API_V1_STR}/users/",
+            f"{settings.API_PREFIX}/users/",
             headers=superuser_token_headers,
             json=data,
         )
@@ -64,7 +64,7 @@ def test_get_existing_user(
     user = crud.create_user(session=db, user_create=user_in)
     user_id = user.id
     r = client.get(
-        f"{settings.API_V1_STR}/users/{user_id}",
+        f"{settings.API_PREFIX}/users/{user_id}",
         headers=superuser_token_headers,
     )
     assert 200 <= r.status_code < 300
@@ -85,13 +85,13 @@ def test_get_existing_user_current_user(client: TestClient, db: Session) -> None
         "username": username,
         "password": password,
     }
-    r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)
+    r = client.post(f"{settings.API_PREFIX}/login/access-token", data=login_data)
     tokens = r.json()
     a_token = tokens["access_token"]
     headers = {"Authorization": f"Bearer {a_token}"}
 
     r = client.get(
-        f"{settings.API_V1_STR}/users/{user_id}",
+        f"{settings.API_PREFIX}/users/{user_id}",
         headers=headers,
     )
     assert 200 <= r.status_code < 300
@@ -105,7 +105,7 @@ def test_get_existing_user_permissions_error(
     client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     r = client.get(
-        f"{settings.API_V1_STR}/users/999999",
+        f"{settings.API_PREFIX}/users/999999",
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403
@@ -122,7 +122,7 @@ def test_create_user_existing_username(
     crud.create_user(session=db, user_create=user_in)
     data = {"email": username, "password": password}
     r = client.post(
-        f"{settings.API_V1_STR}/users/",
+        f"{settings.API_PREFIX}/users/",
         headers=superuser_token_headers,
         json=data,
     )
@@ -138,7 +138,7 @@ def test_create_user_by_normal_user(
     password = random_lower_string()
     data = {"email": username, "password": password}
     r = client.post(
-        f"{settings.API_V1_STR}/users/",
+        f"{settings.API_PREFIX}/users/",
         headers=normal_user_token_headers,
         json=data,
     )
@@ -158,7 +158,7 @@ def test_retrieve_users(
     user_in2 = UserCreate(email=username2, password=password2)
     crud.create_user(session=db, user_create=user_in2)
 
-    r = client.get(f"{settings.API_V1_STR}/users/", headers=superuser_token_headers)
+    r = client.get(f"{settings.API_PREFIX}/users/", headers=superuser_token_headers)
     all_users = r.json()
 
     assert len(all_users["data"]) > 1
@@ -174,7 +174,7 @@ def test_update_user_me(
     email = random_email()
     data = {"full_name": full_name, "email": email}
     r = client.patch(
-        f"{settings.API_V1_STR}/users/me",
+        f"{settings.API_PREFIX}/users/me",
         headers=normal_user_token_headers,
         json=data,
     )
@@ -199,7 +199,7 @@ def test_update_password_me(
         "new_password": new_password,
     }
     r = client.patch(
-        f"{settings.API_V1_STR}/users/me/password",
+        f"{settings.API_PREFIX}/users/me/password",
         headers=superuser_token_headers,
         json=data,
     )
@@ -219,7 +219,7 @@ def test_update_password_me(
         "new_password": settings.FIRST_SUPERUSER_PASSWORD,
     }
     r = client.patch(
-        f"{settings.API_V1_STR}/users/me/password",
+        f"{settings.API_PREFIX}/users/me/password",
         headers=superuser_token_headers,
         json=old_data,
     )
@@ -235,7 +235,7 @@ def test_update_password_me_incorrect_password(
     new_password = random_lower_string()
     data = {"current_password": new_password, "new_password": new_password}
     r = client.patch(
-        f"{settings.API_V1_STR}/users/me/password",
+        f"{settings.API_PREFIX}/users/me/password",
         headers=superuser_token_headers,
         json=data,
     )
@@ -254,7 +254,7 @@ def test_update_user_me_email_exists(
 
     data = {"email": user.email}
     r = client.patch(
-        f"{settings.API_V1_STR}/users/me",
+        f"{settings.API_PREFIX}/users/me",
         headers=normal_user_token_headers,
         json=data,
     )
@@ -270,7 +270,7 @@ def test_update_password_me_same_password_error(
         "new_password": settings.FIRST_SUPERUSER_PASSWORD,
     }
     r = client.patch(
-        f"{settings.API_V1_STR}/users/me/password",
+        f"{settings.API_PREFIX}/users/me/password",
         headers=superuser_token_headers,
         json=data,
     )
@@ -288,7 +288,7 @@ def test_register_user(client: TestClient, db: Session) -> None:
         full_name = random_lower_string()
         data = {"email": username, "password": password, "full_name": full_name}
         r = client.post(
-            f"{settings.API_V1_STR}/users/signup",
+            f"{settings.API_PREFIX}/users/signup",
             json=data,
         )
         assert r.status_code == 200
@@ -311,7 +311,7 @@ def test_register_user_forbidden_error(client: TestClient) -> None:
         full_name = random_lower_string()
         data = {"email": username, "password": password, "full_name": full_name}
         r = client.post(
-            f"{settings.API_V1_STR}/users/signup",
+            f"{settings.API_PREFIX}/users/signup",
             json=data,
         )
         assert r.status_code == 403
@@ -330,7 +330,7 @@ def test_register_user_already_exists_error(client: TestClient) -> None:
             "full_name": full_name,
         }
         r = client.post(
-            f"{settings.API_V1_STR}/users/signup",
+            f"{settings.API_PREFIX}/users/signup",
             json=data,
         )
         assert r.status_code == 400
@@ -350,7 +350,7 @@ def test_update_user(
 
     data = {"full_name": "Updated_full_name"}
     r = client.patch(
-        f"{settings.API_V1_STR}/users/{user.id}",
+        f"{settings.API_PREFIX}/users/{user.id}",
         headers=superuser_token_headers,
         json=data,
     )
@@ -371,7 +371,7 @@ def test_update_user_not_exists(
 ) -> None:
     data = {"full_name": "Updated_full_name"}
     r = client.patch(
-        f"{settings.API_V1_STR}/users/99999999",
+        f"{settings.API_PREFIX}/users/99999999",
         headers=superuser_token_headers,
         json=data,
     )
@@ -394,7 +394,7 @@ def test_update_user_email_exists(
 
     data = {"email": user2.email}
     r = client.patch(
-        f"{settings.API_V1_STR}/users/{user.id}",
+        f"{settings.API_PREFIX}/users/{user.id}",
         headers=superuser_token_headers,
         json=data,
     )
@@ -413,13 +413,13 @@ def test_delete_user_me(client: TestClient, db: Session) -> None:
         "username": username,
         "password": password,
     }
-    r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)
+    r = client.post(f"{settings.API_PREFIX}/login/access-token", data=login_data)
     tokens = r.json()
     a_token = tokens["access_token"]
     headers = {"Authorization": f"Bearer {a_token}"}
 
     r = client.delete(
-        f"{settings.API_V1_STR}/users/me",
+        f"{settings.API_PREFIX}/users/me",
         headers=headers,
     )
     assert r.status_code == 200
@@ -437,7 +437,7 @@ def test_delete_user_me_as_superuser(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     r = client.delete(
-        f"{settings.API_V1_STR}/users/me",
+        f"{settings.API_PREFIX}/users/me",
         headers=superuser_token_headers,
     )
     assert r.status_code == 403
@@ -454,7 +454,7 @@ def test_delete_user_super_user(
     user = crud.create_user(session=db, user_create=user_in)
     user_id = user.id
     r = client.delete(
-        f"{settings.API_V1_STR}/users/{user_id}",
+        f"{settings.API_PREFIX}/users/{user_id}",
         headers=superuser_token_headers,
     )
     assert r.status_code == 200
@@ -468,7 +468,7 @@ def test_delete_user_not_found(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     r = client.delete(
-        f"{settings.API_V1_STR}/users/99999999",
+        f"{settings.API_PREFIX}/users/99999999",
         headers=superuser_token_headers,
     )
     assert r.status_code == 404
@@ -483,7 +483,7 @@ def test_delete_user_current_super_user_error(
     user_id = super_user.id
 
     r = client.delete(
-        f"{settings.API_V1_STR}/users/{user_id}",
+        f"{settings.API_PREFIX}/users/{user_id}",
         headers=superuser_token_headers,
     )
     assert r.status_code == 403
@@ -499,7 +499,7 @@ def test_delete_user_without_privileges(
     user = crud.create_user(session=db, user_create=user_in)
 
     r = client.delete(
-        f"{settings.API_V1_STR}/users/{user.id}",
+        f"{settings.API_PREFIX}/users/{user.id}",
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403
