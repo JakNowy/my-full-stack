@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.common import security
 from app.common.config import settings
 from app.models import TokenPayload, User
-from app.db.session import session
+from app.db.session import SessionFactory
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_PREFIX}/login/access-token"
@@ -19,7 +19,7 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 
 async def get_db() -> AsyncSession:
-    async with session() as db:
+    async with SessionFactory() as db:
         yield db
 
 

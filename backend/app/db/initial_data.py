@@ -3,7 +3,7 @@ import asyncio
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.db.session import session
+from app.db.session import SessionFactory
 from app import crud
 from app.common.config import settings
 from app.models import User, UserCreate
@@ -27,7 +27,7 @@ async def init_db(session: AsyncSession) -> None:
 
 async def main() -> None:
     logger.info("Creating initial data")
-    async with session() as db:
+    async with SessionFactory() as db:
         await init_db(db)
     logger.info("Initial data created")
 

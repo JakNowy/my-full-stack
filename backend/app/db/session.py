@@ -16,6 +16,6 @@ db_uri = (
 
 
 engine = create_async_engine(db_uri)
-session = sessionmaker(
+SessionFactory = sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )

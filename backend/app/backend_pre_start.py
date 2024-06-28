@@ -4,7 +4,7 @@ import logging
 from sqlmodel import select
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from app.db.session import session
+from app.db.session import SessionFactory
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,9 +21,9 @@ wait_seconds = 1
 )
 async def init() -> None:
     try:
-        # Try to create session to check if DB is awake
-        async with session() as db:
-            await db.exec(select(1))
+        # Try to create SessionFactory to check if DB is awake
+        async with SessionFactory() as session:
+            await session.exec(select(1))
     except Exception as e:
         logger.error(f"Error raise: {e}")
         raise e
