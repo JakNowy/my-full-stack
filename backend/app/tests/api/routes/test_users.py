@@ -10,7 +10,7 @@ from app.models import User, UserCreate
 from app.tests.utils.utils import random_email, random_lower_string
 
 
-def test_get_users_superuser_me(
+async def test_get_users_superuser_me(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     r = client.get(f"{settings.API_PREFIX}/users/me", headers=superuser_token_headers)
@@ -21,7 +21,7 @@ def test_get_users_superuser_me(
     assert current_user["email"] == settings.FIRST_SUPERUSER
 
 
-def test_get_users_normal_user_me(
+async def test_get_users_normal_user_me(
     client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     r = client.get(f"{settings.API_PREFIX}/users/me", headers=normal_user_token_headers)
@@ -32,7 +32,7 @@ def test_get_users_normal_user_me(
     assert current_user["email"] == settings.EMAIL_TEST_USER
 
 
-def test_create_user_new_email(
+async def test_create_user_new_email(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     with (
@@ -55,7 +55,7 @@ def test_create_user_new_email(
         assert user.email == created_user["email"]
 
 
-def test_get_existing_user(
+async def test_get_existing_user(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -74,7 +74,7 @@ def test_get_existing_user(
     assert existing_user.email == api_user["email"]
 
 
-def test_get_existing_user_current_user(client: TestClient, db: Session) -> None:
+async def test_get_existing_user_current_user(client: TestClient, db: Session) -> None:
     username = random_email()
     password = random_lower_string()
     user_in = UserCreate(email=username, password=password)
@@ -101,7 +101,7 @@ def test_get_existing_user_current_user(client: TestClient, db: Session) -> None
     assert existing_user.email == api_user["email"]
 
 
-def test_get_existing_user_permissions_error(
+async def test_get_existing_user_permissions_error(
     client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     r = client.get(
@@ -112,7 +112,7 @@ def test_get_existing_user_permissions_error(
     assert r.json() == {"detail": "The user doesn't have enough privileges"}
 
 
-def test_create_user_existing_username(
+async def test_create_user_existing_username(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -131,7 +131,7 @@ def test_create_user_existing_username(
     assert "_id" not in created_user
 
 
-def test_create_user_by_normal_user(
+async def test_create_user_by_normal_user(
     client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     username = random_email()
@@ -145,7 +145,7 @@ def test_create_user_by_normal_user(
     assert r.status_code == 403
 
 
-def test_retrieve_users(
+async def test_retrieve_users(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -167,7 +167,7 @@ def test_retrieve_users(
         assert "email" in item
 
 
-def test_update_user_me(
+async def test_update_user_me(
     client: TestClient, normal_user_token_headers: dict[str, str], db: Session
 ) -> None:
     full_name = "Updated Name"
@@ -190,7 +190,7 @@ def test_update_user_me(
     assert user_db.full_name == full_name
 
 
-def test_update_password_me(
+async def test_update_password_me(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     new_password = random_lower_string()
@@ -229,7 +229,7 @@ def test_update_password_me(
     assert verify_password(settings.FIRST_SUPERUSER_PASSWORD, user_db.hashed_password)
 
 
-def test_update_password_me_incorrect_password(
+async def test_update_password_me_incorrect_password(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     new_password = random_lower_string()
@@ -244,7 +244,7 @@ def test_update_password_me_incorrect_password(
     assert updated_user["detail"] == "Incorrect password"
 
 
-def test_update_user_me_email_exists(
+async def test_update_user_me_email_exists(
     client: TestClient, normal_user_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -262,7 +262,7 @@ def test_update_user_me_email_exists(
     assert r.json()["detail"] == "User with this email already exists"
 
 
-def test_update_password_me_same_password_error(
+async def test_update_password_me_same_password_error(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     data = {
@@ -281,7 +281,7 @@ def test_update_password_me_same_password_error(
     )
 
 
-def test_register_user(client: TestClient, db: Session) -> None:
+async def test_register_user(client: TestClient, db: Session) -> None:
     with patch("app.common.config.settings.USERS_OPEN_REGISTRATION", True):
         username = random_email()
         password = random_lower_string()
@@ -304,7 +304,7 @@ def test_register_user(client: TestClient, db: Session) -> None:
         assert verify_password(password, user_db.hashed_password)
 
 
-def test_register_user_forbidden_error(client: TestClient) -> None:
+async def test_register_user_forbidden_error(client: TestClient) -> None:
     with patch("app.common.config.settings.USERS_OPEN_REGISTRATION", False):
         username = random_email()
         password = random_lower_string()
@@ -320,7 +320,7 @@ def test_register_user_forbidden_error(client: TestClient) -> None:
         )
 
 
-def test_register_user_already_exists_error(client: TestClient) -> None:
+async def test_register_user_already_exists_error(client: TestClient) -> None:
     with patch("app.common.config.settings.USERS_OPEN_REGISTRATION", True):
         password = random_lower_string()
         full_name = random_lower_string()
@@ -340,7 +340,7 @@ def test_register_user_already_exists_error(client: TestClient) -> None:
         )
 
 
-def test_update_user(
+async def test_update_user(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -366,7 +366,7 @@ def test_update_user(
     assert user_db.full_name == "Updated_full_name"
 
 
-def test_update_user_not_exists(
+async def test_update_user_not_exists(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     data = {"full_name": "Updated_full_name"}
@@ -379,7 +379,7 @@ def test_update_user_not_exists(
     assert r.json()["detail"] == "The user with this id does not exist in the system"
 
 
-def test_update_user_email_exists(
+async def test_update_user_email_exists(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -402,7 +402,7 @@ def test_update_user_email_exists(
     assert r.json()["detail"] == "User with this email already exists"
 
 
-def test_delete_user_me(client: TestClient, db: Session) -> None:
+async def test_delete_user_me(client: TestClient, db: Session) -> None:
     username = random_email()
     password = random_lower_string()
     user_in = UserCreate(email=username, password=password)
@@ -433,7 +433,7 @@ def test_delete_user_me(client: TestClient, db: Session) -> None:
     assert user_db is None
 
 
-def test_delete_user_me_as_superuser(
+async def test_delete_user_me_as_superuser(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     r = client.delete(
@@ -445,7 +445,7 @@ def test_delete_user_me_as_superuser(
     assert response["detail"] == "Super users are not allowed to delete themselves"
 
 
-def test_delete_user_super_user(
+async def test_delete_user_super_user(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
@@ -464,7 +464,7 @@ def test_delete_user_super_user(
     assert result is None
 
 
-def test_delete_user_not_found(
+async def test_delete_user_not_found(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
     r = client.delete(
@@ -475,7 +475,7 @@ def test_delete_user_not_found(
     assert r.json()["detail"] == "User not found"
 
 
-def test_delete_user_current_super_user_error(
+async def test_delete_user_current_super_user_error(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     super_user = crud.get_user_by_email(session=db, email=settings.FIRST_SUPERUSER)
@@ -490,7 +490,7 @@ def test_delete_user_current_super_user_error(
     assert r.json()["detail"] == "Super users are not allowed to delete themselves"
 
 
-def test_delete_user_without_privileges(
+async def test_delete_user_without_privileges(
     client: TestClient, normal_user_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
