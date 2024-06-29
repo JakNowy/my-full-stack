@@ -9,9 +9,9 @@ from app.common.deps import CurrentUser, SessionDep, get_current_active_superuse
 from app.common import security
 from app.common.config import settings
 from app.common.security import get_password_hash
-from app.cruds.user import user_crud
-from app.models import Message, NewPassword, Token, UserPublic
-from app.utils import (
+from app.cruds.user_crud import user_crud
+from app.models import Message, NewPassword, Token, UserPublic, User, UserUpdate
+from app.common.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
     send_email,
@@ -33,8 +33,6 @@ async def login_access_token(
     )
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return Token(
         access_token=security.create_access_token(
@@ -56,7 +54,8 @@ async def recover_password(email: str, session: SessionDep) -> Message:
     """
     Password Recovery
     """
-    user = await user_crud.get_user_by_email(session=session, email=email)
+    user = await user_crud.get(session, return_as_model=True,
+                               schema_to_select=User, email=email)
 
     if not user:
         raise HTTPException(
@@ -76,25 +75,14 @@ async def recover_password(email: str, session: SessionDep) -> Message:
 
 
 @router.post("/reset-password/")
-async def reset_password(session: SessionDep, body: NewPassword) -> Message:
+async def reset_password(session: SessionDep, current_user: CurrentUser,
+                         body: NewPassword) -> Message:
     """
     Reset password
     """
-    email = verify_password_reset_token(token=body.token)
-    if not email:
-        raise HTTPException(status_code=400, detail="Invalid token")
-    user = await user_crud.get_user_by_email(session=session, email=email)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this email does not exist in the system.",
-        )
-    elif not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
     hashed_password = get_password_hash(password=body.new_password)
-    user.hashed_password = hashed_password
-    session.add(user)
-    session.commit()
+    await user_crud.update(session, {'hashed_password': hashed_password},
+                     allow_multiple=True, id=current_user.id)
     return Message(message="Password updated successfully")
 
 
@@ -107,7 +95,8 @@ async def recover_password_html_content(email: str, session: SessionDep) -> Any:
     """
     HTML Content for Password Recovery
     """
-    user = await user_crud.get_user_by_email(session=session, email=email)
+    user = await user_crud.get(session, return_as_model=True,
+                               schema_to_select=User, email=email)
 
     if not user:
         raise HTTPException(

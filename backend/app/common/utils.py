@@ -8,6 +8,8 @@ import emails  # type: ignore
 import jwt
 from jinja2 import Template
 from jwt.exceptions import InvalidTokenError
+from fastapi import HTTPException
+from starlette import status
 
 from app.common.config import settings
 
@@ -32,7 +34,9 @@ def send_email(
     subject: str = "",
     html_content: str = "",
 ) -> None:
-    assert settings.emails_enabled, "no provided configuration for email variables"
+    if not settings.emails_enabled:
+        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                            detail='Email sending disabled on the server')
     message = emails.Message(
         subject=subject,
         html=html_content,

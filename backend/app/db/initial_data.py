@@ -3,7 +3,7 @@ import asyncio
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.cruds.user import user_crud
+from app.cruds.user_crud import user_crud
 from app.db.session import SessionFactory
 from app.common.config import settings
 from app.models import User, UserCreate
