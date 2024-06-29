@@ -1,7 +1,5 @@
-from typing import Any
-
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import Session, select
+from sqlmodel import Session
 from fastcrud import FastCRUD
 
 from app.common.security import get_password_hash, verify_password

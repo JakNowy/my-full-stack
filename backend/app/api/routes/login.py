@@ -15,7 +15,6 @@ from app.common.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
     send_email,
-    verify_password_reset_token,
 )
 
 router = APIRouter()
