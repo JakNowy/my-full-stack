@@ -10,7 +10,8 @@ from app.common import security
 from app.common.config import settings
 from app.common.security import get_password_hash
 from app.cruds.user_crud import user_crud
-from app.models import Message, NewPassword, Token, UserPublic, User, UserUpdate
+from app.models.app import Message, NewPassword, Token
+from app.models.user import UserPublic, User
 from app.common.utils import (
     generate_password_reset_token,
     generate_reset_password_email,

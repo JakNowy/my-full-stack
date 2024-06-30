@@ -37,6 +37,7 @@ services:
 
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    user: 1000:1000
     restart: always
     networks:
       - traefik-public

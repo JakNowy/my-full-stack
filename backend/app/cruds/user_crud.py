@@ -1,23 +1,43 @@
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Session
 from fastcrud import FastCRUD
 
+from app.common.config import settings
 from app.common.security import get_password_hash, verify_password
-from app.models import UserCreate, User, UserUpdate
+from app.common.utils import generate_new_account_email, send_email
+from app.models.user import UserCreate, User, UserBase, UserPublic
 
 
-class UserCrud(FastCRUD[User, UserCreate, UserUpdate, UserUpdate, UserUpdate]):
-    async def create(self, session: AsyncSession, user_create: UserCreate, commit: bool = True) -> User:
-        db_obj = User.model_validate(
+class UserCrud(FastCRUD[User, UserCreate, UserBase, UserBase, UserBase]):
+    async def create(self, session: AsyncSession, user_create: UserCreate, commit: bool = True) -> UserPublic:
+        if await user_crud.count(session, email=user_create.email):
+            raise HTTPException(
+                status_code=400,
+                detail="The user with this email already exists in the system.",
+            )
+
+        user = User.model_validate(
             user_create, update={"hashed_password": get_password_hash(user_create.password)}
         )
-        session.add(db_obj)
-        if commit:
-            await session.commit()
-        return db_obj
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+
+        if settings.emails_enabled:
+            email_data = generate_new_account_email(
+                email_to=user_create.email, username=user_create.email,
+                password=user_create.password
+            )
+            send_email(
+                email_to=user_create.email,
+                subject=email_data.subject,
+                html_content=email_data.html_content,
+            )
+        return UserPublic.model_validate(user)
 
     async def authenticate(self, session: Session, email: str, password: str) -> User | None:
-        user = await user_crud.get(session, return_as_model=True,
+        user = await self.get(session, return_as_model=True,
                                    schema_to_select=User, email=email)
         if not user:
             return None
