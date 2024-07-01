@@ -4,12 +4,27 @@ from fastcrud import FastCRUD
 from sqlmodel import select, and_
 
 from app.models.adventure import Adventure, MappedAdventure, AdventureOut
-from app.models.user_adventure import UserAdventure
+from app.models.user_adventure import UserAdventure, UserAdventureBase
 
 
 class AdventureCrud(FastCRUD):
+    async def generate_adventure_schema(self, db: AsyncSession,
+                                        adventure_id: int):
+        pass
+
+    async def create(
+        self, db: AsyncSession, user_adventure_in: UserAdventureBase, commit: bool = True
+    ) -> UserAdventure:
+        user_adventure_in.adventure_id
+
+        user_adventure = UserAdventure.model_validate(user_adventure_in, update={})
+        db.add(user_adventure)
+        await db.commit()
+        return user_adventure
+
+    @staticmethod
     async def read_mapped_adventures(
-        self, session: AsyncSession, user_id: int, page: int, page_size: int
+        session: AsyncSession, user_id: int, page: int, page_size: int
     ) -> list[MappedAdventure | AdventureOut]:
         query = (
             select(
@@ -48,5 +63,5 @@ class AdventureCrud(FastCRUD):
 
 
 adventure_crud = AdventureCrud(
-    Adventure,
+    UserAdventure,
 )

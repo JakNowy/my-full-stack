@@ -17,3 +17,7 @@ class Mission(DatabaseModel, MissionBase, table=True):
 
 from app.models.adventure import Adventure
 from app.models.objective import Objective
+
+
+class MissionObjectives(MissionBase):
+    objectives: list["Objective"]

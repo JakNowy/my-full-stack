@@ -12,21 +12,15 @@ class AdventureRouter(EndpointCreator):
         async def endpoint(
             current_user: CurrentUser,
             db: SessionDep,
-            page: int = Query(
-                1, alias="page", description="Page number, starting from 1"
-            ),
-            items_per_page: int = Query(
-                10, alias="itemsPerPage", description="Number of items per page"
-            ),
+            page: int = Query(1, alias="page"),
+            items_per_page: int = Query(10, alias="itemsPerPage"),
         ) -> list[MappedAdventure | AdventureOut]:
-            mapped_adventures = await self.crud.read_mapped_adventures(
+            return await self.crud.read_mapped_adventures(
                 session=db,
                 page=page,
                 page_size=items_per_page,
                 user_id=current_user.id,
             )
-            print(f"{mapped_adventures=}")
-            return mapped_adventures
 
         return endpoint
 
