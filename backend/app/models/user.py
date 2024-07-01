@@ -1,8 +1,11 @@
 from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field
 
-class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
+from app.db.base_model import DatabaseModel, BaseModel
+
+
+class UserBase(BaseModel):
+    email: EmailStr = Field(unique=True, max_length=255)
     first_name: str = Field(max_length=255)
     last_name: str = Field(max_length=255)
 
@@ -11,18 +14,15 @@ class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=40)
 
 
-class User(UserBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+class User(DatabaseModel, UserBase, table=True):
     is_superuser: bool = False
     hashed_password: str
-    # items: list[Item] = Relationship(back_populates="owner")
 
 
-# Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: int
 
 
-class UsersPublic(SQLModel):
+class UsersPublic(BaseModel):
     data: list[UserPublic]
     count: int

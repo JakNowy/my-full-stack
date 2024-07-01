@@ -15,7 +15,7 @@ class BaseIdModel(SQLModel):
 
 
 class TimestampFieldModel(BaseModel):
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 class DatabaseModel(TimestampFieldModel):

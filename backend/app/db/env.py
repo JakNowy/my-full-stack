@@ -10,6 +10,10 @@ from alembic import context
 
 from app.db.session import db_uri
 from app.models.user import User
+from app.models.user_adventure import UserAdventure
+from app.models.adventure import Adventure
+from app.models.mission import Mission
+from app.models.objective import Objective
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
