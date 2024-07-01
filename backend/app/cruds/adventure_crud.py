@@ -1,17 +1,16 @@
-from sqlalchemy import union_all, func
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastcrud import FastCRUD
-from sqlmodel import select, not_, desc, and_
+from sqlmodel import select, and_
 
-from app.models.adventure import Adventure, MappedAdventure
-from app.models.user import User
+from app.models.adventure import Adventure, MappedAdventure, AdventureOut
 from app.models.user_adventure import UserAdventure
 
 
 class AdventureCrud(FastCRUD):
     async def read_mapped_adventures(
         self, session: AsyncSession, user_id: int, page: int, page_size: int
-    ) -> list[MappedAdventure]:
+    ) -> list[MappedAdventure | AdventureOut]:
         query = (
             select(
                 Adventure.id,
@@ -29,10 +28,9 @@ class AdventureCrud(FastCRUD):
         )
         rows = await session.execute(query)
 
-        for row in rows:
-            print(f"{row=}")
-            m = MappedAdventure.model_validate(
-                adventure_id=row[0],
+        return [
+            MappedAdventure(
+                id=row[0],
                 title=row[1],
                 description=row[2],
                 user_adventure_id=row[3],
@@ -40,21 +38,13 @@ class AdventureCrud(FastCRUD):
                 current_mission_step=row[5],
                 completed_objectives=row[6],
                 is_complete=row[7],
-            )
-
-        m = [MappedAdventure.model_validate(
-            adventure_id=row[0],
-            title=row[1],
-            description=row[2],
-            user_adventure_id=row[3],
-            user_id=row[4],
-            current_mission_step=row[5],
-            completed_objectives=row[6],
-            is_complete=row[7],
-        ) for row in rows if True]
-        print(f"{m=}")
-        return m
-
+            ) if row[3] else
+            Adventure(
+                id=row[0],
+                title=row[1],
+                description=row[2],
+            ) for row in rows
+        ]
 
 
 adventure_crud = AdventureCrud(

@@ -2,8 +2,9 @@ from fastapi import Query
 from fastcrud import EndpointCreator
 
 from app.common.deps import get_db, CurrentUser, SessionDep
-from app.cruds.adventure_crud import AdventureCrud, adventure_crud
-from app.models.adventure import Adventure, AdventureBase, MappedAdventure
+from app.cruds.adventure_crud import adventure_crud
+from app.models.adventure import Adventure, AdventureBase, MappedAdventure, \
+    AdventureOut
 
 
 class AdventureRouter(EndpointCreator):
@@ -17,7 +18,7 @@ class AdventureRouter(EndpointCreator):
             items_per_page: int = Query(
                 10, alias="itemsPerPage", description="Number of items per page"
             ),
-        ) -> list[MappedAdventure]:
+        ) -> list[MappedAdventure | AdventureOut]:
             mapped_adventures = await self.crud.read_mapped_adventures(
                 session=db,
                 page=page,

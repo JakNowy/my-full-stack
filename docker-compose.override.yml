@@ -44,6 +44,8 @@ services:
     restart: "no"
     ports:
       - "5432:5432"
+#     extend query logs
+#    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
 
   adminer:
     restart: "no"

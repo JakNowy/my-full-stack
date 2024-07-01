@@ -1,11 +1,15 @@
 from sqlmodel import Relationship, Field
 
-from app.db.base_model import DatabaseModel, BaseModel
+from app.db.base_model import DatabaseModel, BaseModel, BaseIdModel
 
 
 class AdventureBase(BaseModel):
     title: str = Field(max_length=255)
     description: str = Field(max_length=255)
+
+
+class AdventureOut(AdventureBase, BaseIdModel):
+    pass
 
 
 class Adventure(DatabaseModel, AdventureBase, table=True):
@@ -14,7 +18,7 @@ class Adventure(DatabaseModel, AdventureBase, table=True):
 
 
 class MappedAdventure(AdventureBase):
-    adventure_id: int
+    id: int
     user_adventure_id: int | None
     current_mission_step: int | None
     completed_objectives: list | None
