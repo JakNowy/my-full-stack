@@ -10,7 +10,7 @@ class ObjectiveBase(BaseModel):
     solution: str
     objective_type: ObjectiveType
 
-    mission_id: int = Field(foreign_key="adventure.id")
+    mission_id: int = Field(foreign_key="mission.id")
 
 
 class Objective(DatabaseModel, ObjectiveBase, table=True):

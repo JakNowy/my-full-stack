@@ -1,6 +1,5 @@
 from sqlmodel import Relationship, Field
 
-from app.common.types.sql_types import BaseString
 from app.db.base_model import DatabaseModel, BaseModel
 
 
@@ -17,3 +16,4 @@ class Mission(DatabaseModel, MissionBase, table=True):
 
 
 from app.models.adventure import Adventure
+from app.models.objective import Objective

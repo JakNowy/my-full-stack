@@ -19,7 +19,7 @@ class TimestampFieldModel(BaseModel):
 
 
 class DatabaseModel(TimestampFieldModel):
-    id: int | None = Field(primary_key=True)
+    id: int | None = Field(primary_key=True, default=None)
 
     def __str__(self):
         return f"id: {self.id}"

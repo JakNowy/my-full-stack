@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table('adventure',
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -32,7 +32,7 @@ def upgrade() -> None:
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('first_name', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('last_name', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('hashed_password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -44,7 +44,7 @@ def upgrade() -> None:
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('step', sa.Integer(), nullable=False),
     sa.Column('adventure_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['adventure_id'], ['adventure.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -55,30 +55,68 @@ def upgrade() -> None:
     sa.Column('solution', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('objective_type', sa.Enum('INPUT', 'QUIZ', 'QR_CODE', 'PUZZLE', name='objective_type'), nullable=False),
     sa.Column('mission_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['mission_id'], ['adventure.id'], ),
+    sa.ForeignKeyConstraint(['mission_id'], ['mission.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('useradventure',
+    op.create_table('user_adventure',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('current_mission_step', sa.Integer(), nullable=False),
     sa.Column('completed_objectives', sa.ARRAY(sa.Integer()), nullable=True),
     sa.Column('is_complete', sa.Boolean(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('adventure_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('schema', sa.JSON(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
+    sa.Column('adventure_schema', sa.JSON(), nullable=True),
     sa.ForeignKeyConstraint(['adventure_id'], ['adventure.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.execute(
+        """        
+        INSERT INTO "user" (first_name, last_name, email, hashed_password, is_superuser)
+        VALUES ('Jakub', 'Nowakowski', 'jakub@example.com', '$2b$12$xMUjWVP3dJT8JPTKpD41U.Rr82uKXKwKY7UK.BQ/y.0pNT4oSKlna', 'True');
+        """
+    )
+    op.execute(
+        """        
+        INSERT INTO "adventure" (title, description)
+        VALUES ('Adventure title 1', 'Adventure description 1'),
+               ('Adventure title 2', 'Adventure description 2'),
+               ('Adventure title 3', 'Adventure description 3');
+        """
+    )
+    op.execute(
+        """        
+        INSERT INTO "mission" (title, description, step, adventure_id)
+        VALUES ('Mission title 1', 'Mission description 1', 1, 1),
+               ('Mission title 2', 'Mission description 2', 2, 1),
+               ('Mission title 3', 'Mission description 3', 3, 1);
+        """
+    )
+    op.execute(
+        """        
+        INSERT INTO "objective" (title, description, solution, objective_type, mission_id)
+        VALUES ('Objective title 1', 'Objective description 1', 123, 'INPUT', 1),
+               ('Objective title 2', 'Objective description 2', 123, 'QUIZ', 1),
+               ('Objective title 3', 'Objective description 3', 123, 'QR_CODE', 1),
+               ('Objective title 4', 'Objective description 4', 123, 'INPUT', 2);
+        """
+    )
+    op.execute(
+        """
+        INSERT INTO "user_adventure" (current_mission_step, completed_objectives, is_complete, adventure_schema, adventure_id, user_id)
+        VALUES ('1', ARRAY[1, 2], false, null, 1, 1),
+               ('2', null, false, null, 2, 1);
+        """
     )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('useradventure')
+    op.drop_table('user_adventure')
     op.drop_table('objective')
     op.drop_table('mission')
     op.drop_table('user')

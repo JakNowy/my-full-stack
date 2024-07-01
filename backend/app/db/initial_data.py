@@ -3,6 +3,8 @@ import asyncio
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.cruds.adventure_crud import adventure_crud
+from app.models.adventure import Adventure
 from app.models.user import User, UserCreate
 from app.cruds.user_crud import user_crud
 from app.db.session import SessionFactory
@@ -23,6 +25,14 @@ async def init_db(session: AsyncSession) -> None:
             is_superuser=True,
         )
         user = await user_crud.create(session=session, user_create=user_in)
+        print(f'Created first user: {user}')
+        adventure = Adventure.model_validate(
+            title='Adventure title 1',
+            description='Adventure description 1'
+        )
+        adventure = await adventure_crud.create(session, adventure)
+
+
 
 
 async def main() -> None:

@@ -1,11 +1,10 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException
+from fastapi import HTTPException
 from fastapi.params import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from fastcrud import EndpointCreator
-from fastcrud.endpoint.crud_router import crud_router
 
 from app.common import security
 from app.common.deps import (
@@ -17,8 +16,6 @@ from app.common.config import settings
 from app.cruds.user_crud import user_crud
 from app.models.app import Token
 from app.models.user import UserCreate, User, UserBase
-
-router = APIRouter()
 
 
 class UserRouter(EndpointCreator):
@@ -37,7 +34,7 @@ user_router = UserRouter(
     update_schema=UserBase,
 )
 user_router.add_routes_to_router(included_methods=['create', 'read'])
-user_router=user_router.router
+user_router = user_router.router
 
 
 @user_router.post('/login')

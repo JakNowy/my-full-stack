@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlmodel import Field
+from sqlmodel import Field, Relationship
 
 from app.db.base_model import DatabaseModel, BaseModel
 
@@ -18,6 +18,8 @@ class User(DatabaseModel, UserBase, table=True):
     is_superuser: bool = False
     hashed_password: str
 
+    user_adventures: list["UserAdventure"] = Relationship(back_populates='user')
+
 
 class UserPublic(UserBase):
     id: int
@@ -26,3 +28,6 @@ class UserPublic(UserBase):
 class UsersPublic(BaseModel):
     data: list[UserPublic]
     count: int
+
+
+from app.models.user_adventure import UserAdventure

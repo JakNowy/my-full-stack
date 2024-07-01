@@ -13,7 +13,7 @@ class UserAdventureOut(BaseIdModel):
 
 
 class UserAdventure(DatabaseModel, UserAdventureOut, table=True):
-    schema: dict = Field(sa_column=Column(JSON))
+    adventure_schema: dict = Field(sa_column=Column(JSON))
 
     user: "User" = Relationship(back_populates='user_adventures')
     adventure: "Adventure" = Relationship(back_populates='user_adventures')
