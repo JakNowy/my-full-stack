@@ -6,6 +6,7 @@ from app.db.base_model import DatabaseModel, BaseModel, BaseIdModel
 class AdventureBase(BaseModel):
     title: str = Field(max_length=255)
     description: str = Field(max_length=255)
+    price: int
 
 
 class AdventureOut(AdventureBase, BaseIdModel):

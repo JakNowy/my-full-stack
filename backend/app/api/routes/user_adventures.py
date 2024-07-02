@@ -3,9 +3,11 @@ from fastcrud import EndpointCreator
 from starlette import status
 
 from app.common.deps import get_db, UserDep, SessionDep
+from app.cruds.adventure_crud import adventure_crud
 from app.cruds.objective_crud import objective_crud
 from app.cruds.user_adventure_crud import user_adventure_crud
-from app.models.adventure import MappedAdventure, AdventureOut
+from app.cruds.user_crud import user_crud
+from app.models.adventure import MappedAdventure, AdventureOut, Adventure
 from app.models.objective import ObjectiveSolution
 from app.models.user_adventure import UserAdventure, UserAdventureIn, \
     UserAdventureBase, UserAdventureOut
@@ -34,6 +36,20 @@ class UserAdventureRouter(EndpointCreator):
             current_user: UserDep,
             user_adventure_in: UserAdventureIn,
         ) -> UserAdventureOut:
+
+            adventure: Adventure = await adventure_crud.get(
+                db, id=user_adventure_in.adventure_id,
+                schema_to_select=AdventureOut, return_as_model=True
+            )
+            if adventure.price > current_user.money:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f'Adventure costs {adventure.price}, '
+                           f'but you only have {current_user.money}'
+                )
+            current_user.money -= adventure.price
+            user_crud.update(db, current_user, allow_multiple=True)
+
             return await self.crud.create(
                 db=db,
                 user_adventure_base=UserAdventureBase.model_validate(

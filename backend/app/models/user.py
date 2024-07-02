@@ -17,6 +17,7 @@ class UserCreate(UserBase):
 class User(DatabaseModel, UserBase, table=True):
     is_superuser: bool = False
     hashed_password: str
+    money: int = 100
 
     user_adventures: list["UserAdventure"] = Relationship(back_populates='user')
 

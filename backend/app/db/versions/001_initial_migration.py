@@ -26,6 +26,7 @@ def upgrade() -> None:
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
@@ -36,6 +37,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('hashed_password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('money', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -53,7 +55,7 @@ def upgrade() -> None:
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
     sa.Column('solution', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('objective_type', sa.Enum('INPUT', 'QUIZ', 'QR_CODE', 'PUZZLE', name='objective_type'), nullable=False),
+    sa.Column('objective_type', sa.Enum('INPUT', 'QUIZ', 'QR_CODE', 'PUZZLE', name='objectivetype'), nullable=False),
     sa.Column('mission_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
     sa.Column('id', sa.Integer(), nullable=False),
@@ -75,17 +77,18 @@ def upgrade() -> None:
     )
     op.execute(
         """        
-        INSERT INTO "user" (first_name, last_name, email, hashed_password, is_superuser)
-        VALUES ('Jakub', 'Nowakowski', 'jakub@example.com', '$2b$12$xMUjWVP3dJT8JPTKpD41U.Rr82uKXKwKY7UK.BQ/y.0pNT4oSKlna', 'True');
+        INSERT INTO "user" (first_name, last_name, email, hashed_password, is_superuser, money)
+        VALUES ('Jakub', 'Nowakowski', 'jakub@example.com', '$2b$12$xMUjWVP3dJT8JPTKpD41U.Rr82uKXKwKY7UK.BQ/y.0pNT4oSKlna', 'True', 200),
+               ('Test', 'Random', 'test@example.com', '$2b$12$xMUjWVP3dJT8JPTKpD41U.Rr82uKXKwKY7UK.BQ/y.0pNT4oSKlna', 'False', 5);
         """
     )
     op.execute(
         """        
-        INSERT INTO "adventure" (title, description)
-        VALUES ('Adventure title 1', 'Adventure description 1'),
-               ('Adventure title 2', 'Adventure description 2'),
-               ('Adventure title 3', 'Adventure description 3');
-               ('Adventure title 4', 'Adventure description 4');
+        INSERT INTO "adventure" (title, description, price)
+        VALUES ('Adventure title 1', 'Adventure description 1', 10),
+               ('Adventure title 2', 'Adventure description 2', 10),
+               ('Adventure title 3', 'Adventure description 3', 10),
+               ('Adventure title 4', 'Adventure description 4', 10);
         """
     )
     op.execute(
@@ -93,9 +96,9 @@ def upgrade() -> None:
         INSERT INTO "mission" (title, description, step, adventure_id)
         VALUES ('Mission title 1', 'Mission description 1', 1, 1),
                ('Mission title 2', 'Mission description 2', 2, 1),
-               ('Mission title 3', 'Mission description 3', 3, 1);
-               ('Mission title 4', 'Mission description 4', 1, 4);
-               ('Mission title 5', 'Mission description 5', 2, 4);
+               ('Mission title 3', 'Mission description 3', 3, 1),
+               ('Mission title 4', 'Mission description 4', 1, 4),
+               ('Mission title 5', 'Mission description 5', 2, 4),
                ('Mission title 6', 'Mission description 6', 3, 4);
         """
     )
@@ -105,17 +108,17 @@ def upgrade() -> None:
         VALUES ('Objective title 1', 'Objective description 1', 123, 'INPUT', 1),
                ('Objective title 2', 'Objective description 2', 123, 'QUIZ', 1),
                ('Objective title 3', 'Objective description 3', 123, 'QR_CODE', 1),
-               ('Objective title 4', 'Objective description 4', 123, 'INPUT', 2);
+               ('Objective title 4', 'Objective description 4', 123, 'INPUT', 2),
                ('Objective title 5', 'Objective description 5', 123, 'QUIZ', 4),
                ('Objective title 6', 'Objective description 6', 123, 'QR_CODE', 5),
-               ('Objective title 7', 'Objective description 7', 123, 'INPUT', 5);
+               ('Objective title 7', 'Objective description 7', 123, 'INPUT', 5),
                ('Objective title 8', 'Objective description 8', 123, 'INPUT', 6);
         """
     )
     op.execute(
         """
         INSERT INTO "useradventure" (current_mission_step, completed_objectives, is_complete, adventure_schema, adventure_id, user_id)
-        VALUES ('1', ARRAY[1, 2], false, null, 1, 1),
+        VALUES ('1', ARRAY[1, 2], false, null, 1, 1);
         """
     )
     # ### end Alembic commands ###
