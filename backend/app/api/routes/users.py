@@ -8,7 +8,7 @@ from fastcrud import EndpointCreator
 
 from app.common import security
 from app.common.deps import (
-    CurrentUser,
+    UserDep,
     SessionDep,
     get_db,
 )
@@ -20,7 +20,7 @@ from app.models.user import UserCreate, User, UserBase
 
 class UserRouter(EndpointCreator):
     def _read_item(self):
-        async def endpoint(current_user: CurrentUser):
+        async def endpoint(current_user: UserDep):
             return current_user
 
         return endpoint

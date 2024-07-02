@@ -41,7 +41,7 @@ async def get_current_user(session: "SessionDep", token: "TokenDep") -> User:
     return user
 
 
-def get_current_active_superuser(current_user: "CurrentUser") -> User:
+def get_current_active_superuser(current_user: "UserDep") -> User:
     if not current_user.is_superuser:
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
@@ -51,4 +51,4 @@ def get_current_active_superuser(current_user: "CurrentUser") -> User:
 
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
-CurrentUser = Annotated[User, Depends(get_current_user)]
+UserDep = Annotated[User, Depends(get_current_user)]

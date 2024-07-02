@@ -20,4 +20,5 @@ from app.models.objective import Objective
 
 
 class MissionObjectives(MissionBase):
+    id: int
     objectives: list["Objective"]

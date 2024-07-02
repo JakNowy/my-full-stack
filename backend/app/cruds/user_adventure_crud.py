@@ -3,23 +3,29 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastcrud import FastCRUD
 from sqlmodel import select, and_
 
+from app.cruds.mission_crud import mission_crud
 from app.models.adventure import Adventure, MappedAdventure, AdventureOut
-from app.models.user_adventure import UserAdventure, UserAdventureBase
+from app.models.user_adventure import UserAdventure, UserAdventureBase, \
+    UserAdventureOut
 
 
-class AdventureCrud(FastCRUD):
-    async def generate_adventure_schema(self, db: AsyncSession,
-                                        adventure_id: int):
-        pass
-
+class UserAdventureCrud(FastCRUD):
     async def create(
-        self, db: AsyncSession, user_adventure_in: UserAdventureBase, commit: bool = True
-    ) -> UserAdventure:
-        user_adventure_in.adventure_id
+        self, db: AsyncSession,
+        user_adventure_base: UserAdventureBase, commit: bool = True
+    ) -> UserAdventureOut:
 
-        user_adventure = UserAdventure.model_validate(user_adventure_in, update={})
+        adventure_schema = await self.generate_adventure_schema(
+            db=db, adventure_id=user_adventure_base.adventure_id
+        )
+        user_adventure = UserAdventure.model_validate(
+            user_adventure_base,
+            update={'adventure_schema': adventure_schema}
+        )
+
         db.add(user_adventure)
         await db.commit()
+        await db.refresh(user_adventure)
         return user_adventure
 
     @staticmethod
@@ -61,7 +67,18 @@ class AdventureCrud(FastCRUD):
             ) for row in rows
         ]
 
+    @staticmethod
+    async def generate_adventure_schema(db: AsyncSession, adventure_id: int):
+        adventure_missions = await mission_crud.get_missions_and_objectives(
+            db, adventure_id=adventure_id
+        )
 
-adventure_crud = AdventureCrud(
+        return {
+            mission.id: [objective.id for objective in mission.objectives] for
+            mission in adventure_missions
+        }
+
+
+user_adventure_crud = UserAdventureCrud(
     UserAdventure,
 )
