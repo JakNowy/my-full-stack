@@ -1,9 +1,12 @@
-from fastapi import Query
+from fastapi import Query, HTTPException
 from fastcrud import EndpointCreator
+from starlette import status
 
 from app.common.deps import get_db, UserDep, SessionDep
+from app.cruds.objective_crud import objective_crud
 from app.cruds.user_adventure_crud import user_adventure_crud
 from app.models.adventure import MappedAdventure, AdventureOut
+from app.models.objective import ObjectiveSolution
 from app.models.user_adventure import UserAdventure, UserAdventureIn, \
     UserAdventureBase, UserAdventureOut
 
@@ -50,3 +53,41 @@ user_adventure_router = UserAdventureRouter(
 )
 user_adventure_router.add_routes_to_router(included_methods=['read_multi', 'create'])
 user_adventure_router = user_adventure_router.router
+
+
+@user_adventure_router.post('/solve_objective')
+async def solve_objective(
+    db: SessionDep,
+    current_user: UserDep,
+    solution_in: ObjectiveSolution,
+):
+    if not (
+            objective_mission_id := await objective_crud.verify_solution(
+                db, solution_in.objective_id, solution_in.solution
+            )
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid solution'
+        )
+    if not (
+        user_adventure := await user_adventure_crud.verify_user_adventure(
+            db, solution_in.user_adventure_id, solution_in.objective_id,
+            objective_mission_id, current_user.id
+        )
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Invalid user_adventure'
+        )
+
+    if not await user_adventure_crud.verify_mission_step(
+        db, user_adventure, objective_mission_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Invalid mission step'
+        )
+
+    return await user_adventure_crud.advance_user_adventure(
+        db, user_adventure, solution_in.objective_id, objective_mission_id
+    )

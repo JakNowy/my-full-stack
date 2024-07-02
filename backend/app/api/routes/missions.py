@@ -13,7 +13,6 @@ class MissionRouter(EndpointCreator):
             db: SessionDep,
             adventure_id: int,
         ) -> list[MissionObjectives]:
-            self.crud: MissionCrud
             return await self.crud.get_missions_and_objectives(db, adventure_id)
 
         return endpoint

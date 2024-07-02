@@ -1,7 +1,7 @@
 from fastcrud import FastCRUD
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from app.common.deps import SessionDep
 from app.models.mission import Mission, MissionObjectives
 from app.models.objective import Objective
 
@@ -9,7 +9,7 @@ from app.models.objective import Objective
 class MissionCrud(FastCRUD):
     @staticmethod
     async def get_missions_and_objectives(
-        db: SessionDep,
+        db: AsyncSession,
         adventure_id: int,
     ) -> list[MissionObjectives]:
         rows = await db.execute(

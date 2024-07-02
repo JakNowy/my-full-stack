@@ -3,8 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastcrud import FastCRUD
 from sqlmodel import select, and_
 
+from app.common.deps import UserDep
 from app.cruds.mission_crud import mission_crud
+from app.cruds.objective_crud import objective_crud
 from app.models.adventure import Adventure, MappedAdventure, AdventureOut
+from app.models.mission import Mission
 from app.models.user_adventure import UserAdventure, UserAdventureBase, \
     UserAdventureOut
 
@@ -74,9 +77,54 @@ class UserAdventureCrud(FastCRUD):
         )
 
         return {
-            mission.id: [objective.id for objective in mission.objectives] for
-            mission in adventure_missions
+            mission.id: [objective.id for objective in mission.objectives]
+            for mission in adventure_missions
         }
+
+    @staticmethod
+    async def verify_user_adventure(
+        db: AsyncSession, user_adventure_id: int, objective_id: int,
+        mission_id: str, user_id: int
+    ):
+        if (
+            user_adventure := await user_adventure_crud.get(
+                db, id=user_adventure_id, user_id=user_id, return_as_model=True,
+                schema_to_select=UserAdventure
+            )
+        ) and (
+            objective_id in user_adventure.adventure_schema.get(
+                str(mission_id), []
+            )
+        ):
+            return user_adventure
+
+    async def verify_mission_step(
+        self, db: AsyncSession, user_adventure: UserAdventure, mission_id: int
+    ) -> bool:
+        mission: Mission = await mission_crud.get(db, id=mission_id)
+        return user_adventure.current_mission_step == mission['step']
+
+    @staticmethod
+    async def advance_user_adventure(
+        db: AsyncSession, user_adventure: UserAdventure,
+        objective_id: int, mission_id: int
+    ):
+
+        if objective_id not in user_adventure.completed_objectives:
+            user_adventure.completed_objectives.append(objective_id)
+
+        if set(user_adventure.adventure_schema[str(mission_id)]) == set(
+                user_adventure.completed_objectives):
+            if str(mission_id + 1) in user_adventure.adventure_schema:
+                user_adventure.current_mission_step += 1
+                user_adventure.completed_objectives = []
+            else:
+                user_adventure.is_complete = True
+
+        await user_adventure_crud.update(
+            db, user_adventure, allow_multiple=True, id=user_adventure.id
+        )
+        return user_adventure
 
 
 user_adventure_crud = UserAdventureCrud(

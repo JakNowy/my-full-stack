@@ -85,6 +85,7 @@ def upgrade() -> None:
         VALUES ('Adventure title 1', 'Adventure description 1'),
                ('Adventure title 2', 'Adventure description 2'),
                ('Adventure title 3', 'Adventure description 3');
+               ('Adventure title 4', 'Adventure description 4');
         """
     )
     op.execute(
@@ -93,6 +94,9 @@ def upgrade() -> None:
         VALUES ('Mission title 1', 'Mission description 1', 1, 1),
                ('Mission title 2', 'Mission description 2', 2, 1),
                ('Mission title 3', 'Mission description 3', 3, 1);
+               ('Mission title 4', 'Mission description 4', 1, 4);
+               ('Mission title 5', 'Mission description 5', 2, 4);
+               ('Mission title 6', 'Mission description 6', 3, 4);
         """
     )
     op.execute(
@@ -102,13 +106,16 @@ def upgrade() -> None:
                ('Objective title 2', 'Objective description 2', 123, 'QUIZ', 1),
                ('Objective title 3', 'Objective description 3', 123, 'QR_CODE', 1),
                ('Objective title 4', 'Objective description 4', 123, 'INPUT', 2);
+               ('Objective title 5', 'Objective description 5', 123, 'QUIZ', 4),
+               ('Objective title 6', 'Objective description 6', 123, 'QR_CODE', 5),
+               ('Objective title 7', 'Objective description 7', 123, 'INPUT', 5);
+               ('Objective title 8', 'Objective description 8', 123, 'INPUT', 6);
         """
     )
     op.execute(
         """
         INSERT INTO "useradventure" (current_mission_step, completed_objectives, is_complete, adventure_schema, adventure_id, user_id)
         VALUES ('1', ARRAY[1, 2], false, null, 1, 1),
-               ('2', null, false, null, 2, 1);
         """
     )
     # ### end Alembic commands ###

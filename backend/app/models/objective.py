@@ -1,3 +1,4 @@
+from pydantic import PositiveInt
 from sqlmodel import Relationship, Field
 
 from app.common.enums import ObjectiveType
@@ -15,6 +16,12 @@ class ObjectiveBase(BaseModel):
 
 class Objective(DatabaseModel, ObjectiveBase, table=True):
     mission: "Mission" = Relationship(back_populates='objectives')
+
+
+class ObjectiveSolution(BaseModel):
+    user_adventure_id: PositiveInt
+    objective_id: PositiveInt
+    solution: str
 
 
 from app.models.mission import Mission

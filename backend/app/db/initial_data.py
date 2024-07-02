@@ -3,7 +3,6 @@ import asyncio
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.cruds.adventure_crud import user_adventure_crud
 from app.models.adventure import Adventure
 from app.models.user import User, UserCreate
 from app.cruds.user_crud import user_crud
@@ -30,9 +29,6 @@ async def init_db(session: AsyncSession) -> None:
             title='Adventure title 1',
             description='Adventure description 1'
         )
-        adventure = await user_adventure_crud.create(session, adventure)
-
-
 
 
 async def main() -> None:

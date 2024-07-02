@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from sqlmodel import Field, Column, Integer, ARRAY, JSON, Relationship
 
 from app.db.base_model import DatabaseModel, BaseModel
