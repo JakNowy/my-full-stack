@@ -36,6 +36,14 @@ class UserAdventureRouter(EndpointCreator):
             current_user: UserDep,
             user_adventure_in: UserAdventureIn,
         ) -> UserAdventureOut:
+            if await user_adventure_crud.get(
+                db, adventure_id=user_adventure_in.adventure_id,
+                user_id=current_user.id
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail='You already have bought this adventure'
+                )
 
             adventure: Adventure = await adventure_crud.get(
                 db, id=user_adventure_in.adventure_id,
