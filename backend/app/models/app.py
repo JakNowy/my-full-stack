@@ -1,5 +1,7 @@
 from sqlmodel import Field, SQLModel
 
+from app.models.user import UserPublic
+
 
 class Message(SQLModel):
     message: str
@@ -14,6 +16,11 @@ class Token(SQLModel):
 # Contents of JWT token
 class TokenPayload(SQLModel):
     sub: int | None = None
+
+
+class LoginResponse(SQLModel):
+    token: Token
+    user: UserPublic
 
 
 class NewPassword(SQLModel):

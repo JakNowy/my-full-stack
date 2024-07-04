@@ -14,7 +14,7 @@ from app.common.deps import (
 )
 from app.common.config import settings
 from app.cruds.user_crud import user_crud
-from app.models.app import Token
+from app.models.app import Token, LoginResponse
 from app.models.user import UserCreate, User, UserBase
 
 
@@ -40,7 +40,7 @@ user_router = user_router.router
 @user_router.post('/login')
 async def login_access_token(
     session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-) -> Token:
+) -> LoginResponse:
     """
     OAuth2 compatible token login, get an access token for future requests
     """
@@ -50,8 +50,11 @@ async def login_access_token(
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return Token(
-        access_token=security.create_access_token(
-            user.id, expires_delta=access_token_expires
-        )
+    return LoginResponse(
+        token=Token(
+            access_token=security.create_access_token(
+                user.id, expires_delta=access_token_expires
+            )
+        ),
+        user=user
     )
