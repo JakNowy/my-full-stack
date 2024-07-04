@@ -15,12 +15,12 @@ from app.common.deps import (
 from app.common.config import settings
 from app.cruds.user_crud import user_crud
 from app.models.app import Token, LoginResponse
-from app.models.user import UserCreate, User, UserBase
+from app.models.user import UserCreate, User, UserBase, UserPublic
 
 
 class UserRouter(EndpointCreator):
     def _read_item(self):
-        async def endpoint(current_user: UserDep):
+        async def endpoint(current_user: UserDep) -> UserPublic:
             return current_user
 
         return endpoint
