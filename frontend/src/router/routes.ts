@@ -1,4 +1,6 @@
-import { RouteRecordRaw } from 'vue-router';
+import {
+  RouteRecordRaw
+} from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -8,7 +10,11 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/HomePage.vue') },
       { path: 'login', component: () => import('pages/LoginPage.vue') },
       { path: 'register', component: () => import('pages/RegisterPage.vue') },
-      { path: 'adventures', component: () => import('pages/AdventuresPage.vue') },
+      {
+        path: 'adventures',
+        component: () => import('pages/AdventuresPage.vue'),
+        meta: {requiresAuth: true}
+      },
     ],
   },
 

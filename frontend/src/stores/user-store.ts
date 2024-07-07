@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import {api, urls} from 'boot/axios';
+import {api, userUrls} from 'boot/axios';
 import qs from 'qs';
 
 export const useUserStore = defineStore('user', () => {
@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
   const fetchUser = async () => {
     if (token.value) {
       try {
-        const response = await api.get(urls.userMe);
+        const response = await api.get(userUrls.userMe);
         user.value = response.data;
       } catch (error) {
         if (error.response && error.response.status === 403) {
@@ -36,9 +36,9 @@ export const useUserStore = defineStore('user', () => {
   const login = async (username: string, password: string) => {
     try {
       const response = await api.post(
-        urls.login, qs.stringify({ username, password })
+        userUrls.login, qs.stringify({ username, password })
       );
-      setToken(response.data.token.accessToken);
+      setToken(response.data.token.access_token);
       user.value = response.data.user;
       router.push('/');
     } catch (error) {
@@ -48,7 +48,7 @@ export const useUserStore = defineStore('user', () => {
 
   const register = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
-      const response = await api.post(urls.register, { email, password, firstName, lastName });
+      const response = await api.post(userUrls.register, { email, password, firstName, lastName });
       setToken(response.data.token.accessToken);
       user.value = response.data.user;
       router.push('/');

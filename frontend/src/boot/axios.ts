@@ -17,10 +17,15 @@ declare module '@vue/runtime-core' {
 const api = axios.create({ baseURL: 'http://localhost/api/' });
 
 
-const urls = {
-  'login': 'users/login',
-  'register': 'users/create',
-  'userMe': 'users/me',
+const adventureUrls = {
+    listAll: 'user_adventures/get_multi',
+    purchaseNew: 'user_adventures/create',
+    solveObjective: 'user_adventures/solve_objective',
+}
+const userUrls = {
+    login: 'users/login',
+    register: 'users/create',
+    userMe: 'users/me',
 }
 
 export default boot(({ app }) => {
@@ -35,4 +40,4 @@ export default boot(({ app }) => {
   //       so you can easily perform requests against your app's API
 });
 
-export { api, urls };
+export { api, userUrls, adventureUrls };

@@ -3,9 +3,10 @@ import {
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
-  createWebHistory,
+  createWebHistory, NavigationGuardNext, RouteLocationNormalized,
 } from 'vue-router';
 import routes from './routes';
+import {useUserStore} from 'stores/user-store';
 
 /*
  * If not building with SSR mode, you can
@@ -29,6 +30,19 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.beforeEach((
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: NavigationGuardNext
+  ) => {
+    const userStore = useUserStore();
+    if (to.meta.requiresAuth && !userStore.token) {
+      next('/login');
+    } else {
+      next();
+    }
   });
 
   return Router;

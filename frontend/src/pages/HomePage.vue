@@ -4,6 +4,7 @@
     <div v-if="user">
       <h1>Welcome, {{ user.firstName }} {{ user.lastName }}</h1>
       <p>{{ user.email }}</p>
+      <q-btn label="My Adventures" to="adventures" />
       <q-btn label="Logout" @click="logout" />
     </div>
     <div v-else>
@@ -23,7 +24,9 @@ export default defineComponent({
     const user = userStore.user;
 
     onMounted(() => {
-      userStore.fetchUser();
+      if (!userStore.user) {
+        userStore.fetchUser();
+      }
     });
 
     const logout = () => {
