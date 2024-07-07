@@ -1,8 +1,9 @@
+// src/stores/adventures-store.ts
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
 import {api, adventureUrls} from 'boot/axios';
+import { ref } from 'vue';
 
-interface Adventure {
+export interface Adventure {
   title: string;
   description: string;
   price: number;
@@ -29,12 +30,8 @@ export const useAdventuresStore = defineStore('adventures', () => {
       });
       // Sort adventures so that those with userAdventureId are at the top
       adventures.value = response.data.sort((a: Adventure, b: Adventure) => {
-        console.log(1)
-        console.log(a)
-        console.log(b)
         if (a.userAdventureId && !b.userAdventureId) return -1;
         if (!a.userAdventureId && b.userAdventureId) return 1;
-        return 0;
       });
     } catch (error) {
       console.error('Failed to fetch adventures:', error);

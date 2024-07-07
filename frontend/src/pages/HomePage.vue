@@ -24,9 +24,6 @@ export default defineComponent({
     const user = userStore.user;
 
     onMounted(() => {
-      if (!userStore.user) {
-        userStore.fetchUser();
-      }
     });
 
     const logout = () => {

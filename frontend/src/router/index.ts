@@ -32,14 +32,19 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach((
+  Router.beforeEach(async (
     to: RouteLocationNormalized,
     from: RouteLocationNormalized,
     next: NavigationGuardNext
   ) => {
     const userStore = useUserStore();
     if (to.meta.requiresAuth && !userStore.token) {
-      next('/login');
+      const existingToken = localStorage.getItem('token');
+      if (existingToken) {
+        await userStore.refreshUser(existingToken)
+      } else {
+        next('/login');
+      }
     } else {
       next();
     }

@@ -7,8 +7,8 @@
       </q-card-section>
       <q-card-section>
         <q-input v-model="email" label="Email" />
-        <q-input v-model="firstName" label="Full Name" />
-        <q-input v-model="lastName" label="Full Name" />
+        <q-input v-model="firstName" label="First Name" />
+        <q-input v-model="lastName" label="Last Name" />
         <q-input v-model="password" label="Password" type="password" />
       </q-card-section>
       <q-card-actions align="center">

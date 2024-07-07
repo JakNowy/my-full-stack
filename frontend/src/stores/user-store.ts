@@ -16,19 +16,18 @@ export const useUserStore = defineStore('user', () => {
 
   const setToken = (newToken: string) => {
     token.value = newToken;
-    localStorage.setItem('token', newToken);
     api.defaults.headers.common['Authorization'] = `bearer ${newToken}`;
+    localStorage.setItem('token', newToken);
   };
 
-  const fetchUser = async () => {
-    if (token.value) {
-      try {
-        const response = await api.get(userUrls.userMe);
-        user.value = response.data;
-      } catch (error) {
-        if (error.response && error.response.status === 403) {
-          logout();
-        }
+  const refreshUser = async (existingToken: string) => {
+    setToken(existingToken)
+    try {
+      const response = await api.get(userUrls.userMe);
+      user.value = response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        logout();
       }
     }
   };
@@ -71,6 +70,6 @@ export const useUserStore = defineStore('user', () => {
     login,
     register,
     logout,
-    fetchUser
+    refreshUser,
   };
 });
