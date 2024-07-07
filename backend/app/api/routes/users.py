@@ -19,11 +19,7 @@ from app.models.user import UserCreate, User, UserBase, UserPublic
 
 
 class UserRouter(EndpointCreator):
-    def _read_item(self):
-        async def endpoint(current_user: UserDep) -> UserPublic:
-            return current_user
-
-        return endpoint
+    pass
 
 
 user_router = UserRouter(
@@ -33,8 +29,13 @@ user_router = UserRouter(
     create_schema=UserCreate,
     update_schema=UserBase,
 )
-user_router.add_routes_to_router(included_methods=['create', 'read'])
+user_router.add_routes_to_router(included_methods=['create'])
 user_router = user_router.router
+
+
+@user_router.post('/me')
+async def endpoint(current_user: UserDep) -> UserPublic:
+    return current_user
 
 
 @user_router.post('/login')
@@ -44,6 +45,7 @@ async def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
+    print(f"{form_data=}")
     user = await user_crud.authenticate(
         session=session, email=form_data.username, password=form_data.password
     )
