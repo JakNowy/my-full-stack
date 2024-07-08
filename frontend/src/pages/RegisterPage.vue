@@ -1,4 +1,3 @@
-<!-- src/components/Register.vue -->
 <template>
   <q-page>
     <q-card>
@@ -19,29 +18,18 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import { useUserStore } from 'stores/user-store';
 
-export default defineComponent({
-  setup() {
-    const email = ref('');
-    const firstName = ref('');
-    const lastName = ref('');
-    const password = ref('');
-    const userStore = useUserStore();
+const email = ref('');
+const firstName = ref('');
+const lastName = ref('');
+const password = ref('');
+const userStore = useUserStore();
 
-    const handleRegister = () => {
-      userStore.register(email.value, password.value, firstName.value, lastName.value);
-    };
+const handleRegister = () => {
+  userStore.register(email.value, password.value, firstName.value, lastName.value);
+};
 
-    return {
-      email,
-      firstName,
-      lastName,
-      password,
-      handleRegister
-    };
-  }
-});
 </script>

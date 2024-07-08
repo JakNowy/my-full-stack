@@ -33,7 +33,7 @@ user_router.add_routes_to_router(included_methods=['create'])
 user_router = user_router.router
 
 
-@user_router.post('/me')
+@user_router.get('/me')
 async def endpoint(current_user: UserDep) -> UserPublic:
     return current_user
 

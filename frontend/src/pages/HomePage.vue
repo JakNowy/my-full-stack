@@ -4,7 +4,7 @@
     <div v-if="user">
       <h1>Welcome, {{ user.firstName }} {{ user.lastName }}</h1>
       <p>{{ user.email }}</p>
-      <q-btn label="My Adventures" to="adventures" />
+      <q-btn label="My Adventures" to="/adventures" />
       <q-btn label="Logout" @click="logout" />
     </div>
     <div v-else>
@@ -14,26 +14,15 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+<script lang="ts" setup>
 import { useUserStore } from 'stores/user-store';
 
-export default defineComponent({
-  setup() {
-    const userStore = useUserStore();
-    const user = userStore.user;
+const userStore = useUserStore();
+const user = userStore.user;
 
-    onMounted(() => {
-    });
 
-    const logout = () => {
-      userStore.logout();
-    };
+const logout = () => {
+  userStore.logout();
+};
 
-    return {
-      user,
-      logout
-    };
-  }
-});
 </script>

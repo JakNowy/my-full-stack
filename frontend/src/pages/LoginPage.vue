@@ -1,4 +1,3 @@
-<!-- src/components/Login.vue -->
 <template>
   <q-page>
     <q-card>
@@ -17,25 +16,15 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import { useUserStore } from 'stores/user-store';
 
-export default defineComponent({
-  setup() {
-    const username = ref('');
-    const password = ref('');
-    const userStore = useUserStore();
+const username = ref('');
+const password = ref('');
+const userStore = useUserStore();
 
-    const handleLogin = () => {
-      userStore.login(username.value, password.value);
-    };
-
-    return {
-      username,
-      password,
-      handleLogin
-    };
-  }
-});
+const handleLogin = () => {
+  userStore.login(username.value, password.value);
+};
 </script>

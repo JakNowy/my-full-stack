@@ -38,14 +38,24 @@ export default route(function (/* { store, ssrContext } */) {
     next: NavigationGuardNext
   ) => {
     const userStore = useUserStore();
-    if (to.meta.requiresAuth && !userStore.token) {
-      const existingToken = localStorage.getItem('token');
-      if (existingToken) {
-        await userStore.refreshUser(existingToken)
+    if (to.meta.requiresAuth || to.fullPath === '/') {
+      if (userStore.token) {
+        if (!userStore.user) {
+          await userStore.refreshUser(userStore.token)
+          if (userStore.user) {
+            next();
+          } else {
+            next('/login');
+          }
+        } else {
+          next()
+        }
       } else {
+          console.log(6)
         next('/login');
       }
     } else {
+          console.log(7)
       next();
     }
   });

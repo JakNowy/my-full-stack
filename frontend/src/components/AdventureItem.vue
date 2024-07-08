@@ -11,24 +11,18 @@
   </q-item>
 </template>
 
-<script lang="ts">
-import {defineComponent, PropType} from 'vue';
+<script setup lang="ts">
+import {PropType} from 'vue';
 import {Adventure} from 'stores/adventures-store';
 
 
-export default defineComponent({
-  props: {
-    adventure: {
-      type: Object as PropType<Adventure>,
-      required: true,
-    },
+defineProps({
+  adventure: {
+    type: Object as PropType<Adventure>,
+    required: true,
   },
-  setup() {
+})
 
-    return {
-    };
-  },
-});
 </script>
 
 <style scoped>
