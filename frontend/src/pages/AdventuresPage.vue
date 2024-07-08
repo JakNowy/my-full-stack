@@ -18,30 +18,29 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, computed } from 'vue';
-import { useAdventuresStore } from 'stores/adventures-store';
+<script lang="ts" setup>
+import { onMounted, computed } from 'vue';
+import {useAdventuresStore} from 'stores/adventures-store';
 import LogoutButton from 'components/LogoutButton.vue';
 import AdventureItem from 'components/AdventureItem.vue';
+import {AxiosError} from 'axios';
 
-export default defineComponent({
-  components: {AdventureItem, LogoutButton },
-  setup() {
-    const adventuresStore = useAdventuresStore();
+const adventuresStore = useAdventuresStore();
+const adventures = computed(() => adventuresStore.adventures);
+const loading = computed(() => adventuresStore.loading);
 
-    onMounted(() => {
-      adventuresStore.fetchAdventures();
+onMounted(() => {
+  adventuresStore.fetchAdventures()
+    .then((data) => {
+      adventuresStore.setAdventures(data)
+    })
+    .catch((error: AxiosError) => {
+      console.error('Error fetching adventures:', error);
     });
-
-    const adventures = computed(() => adventuresStore.adventures);
-    const loading = computed(() => adventuresStore.loading);
-
-    return {
-      adventures,
-      loading,
-    };
-  },
 });
+
+
+
 </script>
 
 <style scoped>
