@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
-import axios from 'axios';
+import {api} from 'boot/axios';
 
 interface Objective {
   id: number;
@@ -64,7 +64,7 @@ const isCompleted = computed(() =>
 
 const submitSolution = async () => {
   try {
-    const response = await axios.post('http://localhost/api/user_adventures/solve_objective', {
+    const response = await api.post('http://localhost/api/user_adventures/solve_objective', {
       userAdventureId: props.userAdventureId,
       objectiveId: props.objective.id,
       solution: solution.value

@@ -84,7 +84,7 @@ const userAdventure = computed(() =>
   adventuresStore.adventures.find(adventure => adventure.id === adventureId)
 );
 
-const userAdventureId = computed(() => userAdventure.value?.id || 0);
+const userAdventureId = computed(() => userAdventure.value?.userAdventureId || 0);
 
 const currentMission = computed(() =>
   missionsStore.missions.find(mission => mission.step === displayedMissionStep.value)
