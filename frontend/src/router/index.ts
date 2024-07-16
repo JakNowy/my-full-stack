@@ -38,27 +38,68 @@ export default route(function (/* { store, ssrContext } */) {
     next: NavigationGuardNext
   ) => {
     const userStore = useUserStore();
-    if (to.meta.requiresAuth || to.fullPath === '/') {
-      if (userStore.token) {
-        if (!userStore.user) {
+    if (!to.meta.requiresAuth) {
+      if (to.fullPath === '/') {
+        if (!userStore.user && userStore.token) {
           await userStore.refreshUser(userStore.token)
-          if (userStore.user) {
-            next();
-          } else {
-            next('/login');
-          }
+          next()
         } else {
           next()
         }
       } else {
-          console.log(6)
-        next('/login');
+        next()
       }
     } else {
-          console.log(7)
-      next();
+      if (userStore.user)
+      {
+        next()
+      } else {
+        if (userStore.token) {
+          await userStore.refreshUser(userStore.token)
+          if (userStore.user) {
+            next()
+          } else {
+            next('/login')
+          }
+        } else {
+          next('/login')
+        }
+      }
     }
-  });
+  })
+
+
+  //   if (to.meta.requiresAuth) {
+  //     if (userStore.token) {
+  //       if (!userStore.user) {
+  //         await userStore.refreshUser(userStore.token)
+  //         if (userStore.user) {
+  //           next();
+  //         } else {
+  //           next('/login');
+  //         }
+  //       } else {
+  //         next()
+  //       }
+  //     } else {
+  //       if (to.fullPath === '/') {
+  //         if (userStore.token && !userStore.user) {
+  //         await userStore.refreshUser(userStore.token)
+  //         if (userStore.user) {
+  //           next();
+  //         } else {
+  //           next('/login');
+  //         }
+  //       }
+  //       else {
+  //         next('/login');
+  //       }
+  //     }
+  //   } else {
+  //         console.log(7)
+  //     next();
+  //   }
+  // });
 
   return Router;
 });

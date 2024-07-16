@@ -17,13 +17,13 @@ class UserAdventureBase(UserAdventureIn):
 
 
 class UserAdventureOut(UserAdventureBase):
-    adventure_schema: dict = Field(sa_column=Column(JSON))
     id: int
 
 
 class UserAdventure(DatabaseModel, UserAdventureOut, table=True):
     user: "User" = Relationship(back_populates='user_adventures')
     adventure: "Adventure" = Relationship(back_populates='user_adventures')
+    adventure_schema: dict = Field(sa_column=Column(JSON))
 
 
 from app.models.adventure import Adventure

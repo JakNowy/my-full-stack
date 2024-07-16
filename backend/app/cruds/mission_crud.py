@@ -14,7 +14,7 @@ class MissionCrud(FastCRUD):
     ) -> list[MissionObjectives]:
         rows = await db.execute(
             select(Mission, Objective)
-            .join(Objective, Mission.id == Objective.mission_id)
+            .outerjoin(Objective, Mission.id == Objective.mission_id)
             .where(Mission.adventure_id == adventure_id)
         )
         objectives_by_mission_id = {}

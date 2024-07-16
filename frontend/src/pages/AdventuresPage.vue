@@ -9,10 +9,9 @@
 
       <div class="bg-cyan q-pa-xl" v-if="loading">Loading adventures...</div>
       <div v-else class="q-pt-xl">
-        <q-list bordered>
-          <AdventureItem v-for="adventure in adventures" :key="adventure.id"
-                         :adventure="adventure"/>
-        </q-list>
+<!--        <q-list bordered>-->
+          <AdventureList :adventures="adventures"/>
+<!--        </q-list>-->
       </div>
     </q-card>
   </q-page>
@@ -22,7 +21,7 @@
 import { onMounted, computed } from 'vue';
 import {useAdventuresStore} from 'stores/adventures-store';
 import LogoutButton from 'components/LogoutButton.vue';
-import AdventureItem from 'components/AdventureItem.vue';
+import AdventureList from 'components/AdventureList.vue';
 import {AxiosError} from 'axios';
 
 const adventuresStore = useAdventuresStore();
@@ -39,6 +38,9 @@ onMounted(() => {
     });
 });
 
+// const goToMissions = (adventureId: number) => {
+//   router.push({ path: `/missions/${adventureId}` });
+// };
 
 
 </script>

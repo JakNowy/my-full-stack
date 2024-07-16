@@ -84,7 +84,7 @@ async def solve_objective(
     db: SessionDep,
     current_user: UserDep,
     solution_in: ObjectiveSolution,
-):
+) -> UserAdventureOut:
     if not (
             objective_mission_id := await objective_crud.verify_solution(
                 db, solution_in.objective_id, solution_in.solution

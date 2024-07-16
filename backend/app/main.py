@@ -4,6 +4,7 @@ from fastapi.routing import APIRoute
 from starlette.datastructures import Headers
 from starlette.middleware.cors import CORSMiddleware
 
+from app.admin.setup import setup_admin_panel
 from app.api.main import api_router
 from app.common.config import settings
 
@@ -15,6 +16,8 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_PREFIX}/openapi.json",
 )
+
+admin = setup_admin_panel(app)
 
 
 class MyCORSMiddleware(CORSMiddleware):

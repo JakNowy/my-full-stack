@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import {api, adventureUrls} from 'boot/axios';
 import { ref } from 'vue';
 
-export interface Adventure {
+export interface AdventureIn {
   title: string;
   description: string;
   price: number;
@@ -12,6 +12,10 @@ export interface Adventure {
   completedObjectives: number[] | null;
   isComplete: boolean | null;
   userId: number | null;
+}
+
+export interface Adventure extends AdventureIn {
+  status: 'complete' | 'inProgress' | 'purchase'
 }
 
 export const useAdventuresStore = defineStore('adventures', () => {
@@ -35,11 +39,6 @@ export const useAdventuresStore = defineStore('adventures', () => {
         },
       });
       adventures = response.data
-      // Sort adventures so that those with userAdventureId are at the top
-      // adventures.value = response.data.sort((a: Adventure, b: Adventure) => {
-      //   if (a.userAdventureId && !b.userAdventureId) return -1;
-      //   if (!a.userAdventureId && b.userAdventureId) return 1;
-      // });
     } catch (error) {
       console.error('Failed to fetch adventures:', error);
     } finally {
@@ -48,10 +47,28 @@ export const useAdventuresStore = defineStore('adventures', () => {
     return adventures
   };
 
+  const updateUserAdventure = (updatedAdventure: Adventure) => {
+    const index = adventures.value.findIndex(adventure => adventure.id === updatedAdventure.id);
+    if (index !== -1) {
+      adventures.value[index] = updatedAdventure;
+    }
+  };
+
+  const updateAdventure = (updatedAdventure: Adventure) => {
+    const index = adventures.value.findIndex(
+      adventure => adventure.id === updatedAdventure.id
+    );
+    if (index !== -1) {
+      adventures.value[index] = { ...adventures.value[index], ...updatedAdventure };
+    }
+  };
+
   return {
     adventures,
     loading,
     fetchAdventures,
     setAdventures,
+    updateUserAdventure,
+    updateAdventure,
   };
 });

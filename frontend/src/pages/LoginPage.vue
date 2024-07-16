@@ -9,8 +9,9 @@
         <q-input v-model="password" label="Password" type="password" />
       </q-card-section>
       <q-card-actions align="center">
-        <q-btn label="Login" @click="handleLogin" />
         <q-btn label="Back" to="/" />
+        <q-btn label="Login" @click="handleLogin" />
+        <q-btn label="Register" to="/register" />
       </q-card-actions>
     </q-card>
   </q-page>

@@ -16,8 +16,8 @@ from app.tests.utils.utils import get_superuser_token_headers
 @pytest.fixture(scope="session", autouse=True)
 async def db() -> Generator[Session, None, None]:
     with AsyncSession(engine) as session:
-        await init_db(session)
         yield session
+        await init_db(session)
         statement = delete(Item)
         await session.execute(statement)
         statement = delete(User)
