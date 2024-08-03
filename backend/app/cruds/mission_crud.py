@@ -15,6 +15,8 @@ class MissionCrud(FastCRUD):
         rows = await db.execute(
             select(Mission, Objective)
             .outerjoin(Objective, Mission.id == Objective.mission_id)
+            .where(Mission.id.is_not(None))
+            .where(Objective.id.is_not(None))
             .where(Mission.adventure_id == adventure_id)
         )
         objectives_by_mission_id = {}

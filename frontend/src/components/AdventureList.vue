@@ -4,10 +4,10 @@
     <q-item class="q-pa-lg adventure-item" v-for="adventure in adventures" :key="adventure.id">
       <q-item-section>
   <!--      @click="goToMissions(adventure.id)-->
+        <q-item-label class="text-bold">{{ adventure.title }}</q-item-label>
         <q-item-label v-if="adventure.userAdventureId">
-          UserAdventure: {{ adventure.userAdventureId }}
+          UA: {{ adventure.userAdventureId }}
         </q-item-label>
-        <q-item-label >{{ adventure.title }}</q-item-label>
         <q-item-label caption>{{ adventure.description }}</q-item-label>
       </q-item-section>
 

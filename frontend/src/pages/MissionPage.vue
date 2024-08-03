@@ -20,7 +20,7 @@
               :key="objective.id"
               :objective="objective"
               :userAdventureId="userAdventureId"
-              :completedObjectives="userAdventure?.completedObjectives || []"
+              :completedObjectives="completedObjectives"
               @objective-solved="handleObjectiveSolved"
             />
           </q-list>
@@ -49,17 +49,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMissionsStore } from 'stores/missions-store';
-import { useAdventuresStore } from 'stores/adventures-store';
+import {useAdventuresStore, UserAdventure} from 'stores/adventures-store';
 import ObjectiveItem from 'components/ObjectiveItem.vue';
-
-interface UserAdventure {
-  adventureId: number;
-  isComplete: boolean;
-  currentMissionStep: number;
-  completedObjectives: number[];
-  userId: number;
-  id: number;
-}
 
 const route = useRoute();
 const router = useRouter();
@@ -75,6 +66,7 @@ onMounted(async () => {
   await missionsStore.fetchMissions(adventureId);
   const userAdventure = adventuresStore.adventures.find(adventure => adventure.id === adventureId);
   if (userAdventure) {
+    adventuresStore.setUserAdventure(userAdventure);
     displayedMissionStep.value = userAdventure.currentMissionStep || 1;
   }
   loading.value = false;
@@ -84,7 +76,8 @@ const userAdventure = computed(() =>
   adventuresStore.adventures.find(adventure => adventure.id === adventureId)
 );
 
-const userAdventureId = computed(() => userAdventure.value?.userAdventureId || 0);
+const userAdventureId = computed(() => userAdventure.value?.userAdventureId ?? 0);
+const completedObjectives = computed(() => adventuresStore.completedObjectives);
 
 const currentMission = computed(() =>
   missionsStore.missions.find(mission => mission.step === displayedMissionStep.value)
@@ -108,15 +101,12 @@ const nextMission = () => {
 };
 
 const handleObjectiveSolved = (newUserAdventure: UserAdventure) => {
-  const currentAdventure = adventuresStore.adventures.find(adventure => adventure.id === newUserAdventure.adventureId);
-  if (currentAdventure) {
-    Object.assign(currentAdventure, newUserAdventure);
-    if (newUserAdventure.isComplete) {
-      isCompleteDialog.value = true;
-    }
-    if (displayedMissionStep.value < newUserAdventure.currentMissionStep) {
-      displayedMissionStep.value = newUserAdventure.currentMissionStep;
-    }
+  adventuresStore.setUserAdventure(newUserAdventure);
+  if (newUserAdventure.isComplete) {
+    isCompleteDialog.value = true;
+  }
+  if (displayedMissionStep.value < newUserAdventure.currentMissionStep) {
+    displayedMissionStep.value = newUserAdventure.currentMissionStep;
   }
 };
 
